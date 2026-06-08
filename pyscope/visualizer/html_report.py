@@ -5,6 +5,10 @@ from __future__ import annotations
 import os
 import hashlib
 import datetime
+try:
+    datetime.timezone
+except AttributeError:  # pragma: no cover
+    pass
 from typing import Dict, Optional
 
 from .schema import C1Result
@@ -320,7 +324,7 @@ def write_html_report(
     num_nodes = metrics.get("total_nodes", len(artifacts.get("nodes", [])))
     num_edges = metrics.get("total_edges", len(artifacts.get("edges", [])))
 
-    generated_at = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    generated_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     file_hash = hashlib.sha256(svg_content.encode("utf-8")).hexdigest()[:12]
 
     html = HTML_TEMPLATE.format(
