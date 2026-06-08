@@ -1,14 +1,10 @@
-"""Render the PyScope HTML dashboard (Minimax dark theme)."""
+"""Render the PyScope HTML dashboard (Observatory dark theme)."""
 
 from __future__ import annotations
 
 import os
 import hashlib
 import datetime
-try:
-    datetime.timezone
-except AttributeError:  # pragma: no cover
-    pass
 from typing import Dict, Optional
 
 from .schema import C1Result
@@ -20,19 +16,16 @@ HTML_TEMPLATE = """<!doctype html>
 <title>PyScope Observation \u2014 {repository}</title>
 <style>
   :root {{
-    --bg: #0D0D0F;
-    --card: #15151B;
-    --card-hover: #1A1A22;
-    --border: #2A2A35;
-    --fg: #E0E0E8;
-    --muted: #8A8A9A;
-    --accent-purple: #8B5CF6;
-    --accent-cyan: #06B6D4;
-    --accent-emerald: #10B981;
-    --accent-amber: #F59E0B;
-    --accent-red: #EF4444;
-    --accent-pink: #F472B6;
-    --gradient: linear-gradient(135deg, #8B5CF6 0%, #06B6D4 50%, #10B981 100%);
+    --bg: #0A0E17;
+    --card: #111827;
+    --card-hover: #1F2937;
+    --border: #1E293B;
+    --fg: #F1F5F9;
+    --muted: #94A3B8;
+    --accent: #38BDF8;
+    --success: #22C55E;
+    --warn: #F59E0B;
+    --danger: #EF4444;
   }}
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
   body {{
@@ -47,26 +40,14 @@ HTML_TEMPLATE = """<!doctype html>
   header {{
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem;
+    border-radius: 8px;
+    padding: 1.75rem;
     margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
-  }}
-  header::before {{
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--gradient);
   }}
   header h1 {{
     font-family: ui-monospace, 'SF Mono', Consolas, monospace;
-    font-size: 2rem;
-    background: var(--gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 1.75rem;
+    color: var(--accent);
     margin-bottom: 0.5rem;
   }}
   header .meta {{
@@ -86,15 +67,14 @@ HTML_TEMPLATE = """<!doctype html>
   .card {{
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 1.25rem;
-    transition: all 0.2s ease;
-    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   }}
   .card:hover {{
     background: var(--card-hover);
     transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }}
   .card .label {{
     color: var(--muted);
@@ -105,24 +85,18 @@ HTML_TEMPLATE = """<!doctype html>
   }}
   .card .value {{
     font-family: ui-monospace, 'SF Mono', Consolas, monospace;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 600;
+    color: var(--fg);
   }}
-  .card .value.purple {{ color: var(--accent-purple); }}
-  .card .value.cyan {{ color: var(--accent-cyan); }}
-  .card .value.emerald {{ color: var(--accent-emerald); }}
-  .card .value.amber {{ color: var(--accent-amber); }}
-  .card .value.red {{ color: var(--accent-red); }}
-  .card .value.pink {{ color: var(--accent-pink); }}
-  .card .sub {{
-    color: var(--muted);
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-  }}
+  .card .value.accent {{ color: var(--accent); }}
+  .card .value.success {{ color: var(--success); }}
+  .card .value.warn {{ color: var(--warn); }}
+  .card .value.danger {{ color: var(--danger); }}
   .graph-container {{
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
     overflow: auto;
@@ -142,7 +116,7 @@ HTML_TEMPLATE = """<!doctype html>
   .legend {{
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 1.25rem;
     margin-bottom: 1.5rem;
   }}
@@ -170,6 +144,7 @@ HTML_TEMPLATE = """<!doctype html>
     width: 14px; height: 14px;
     border-radius: 3px;
     flex-shrink: 0;
+    border: 1px solid var(--border);
   }}
   .legend-item code {{
     font-family: ui-monospace, 'SF Mono', Consolas, monospace;
@@ -186,19 +161,14 @@ HTML_TEMPLATE = """<!doctype html>
   }}
   footer code {{
     font-family: ui-monospace, 'SF Mono', Consolas, monospace;
-    color: var(--accent-cyan);
+    color: var(--accent);
   }}
-  @keyframes pulse {{
-    0%, 100% {{ opacity: 1; }}
-    50% {{ opacity: 0.5; }}
-  }}
-  .pulse {{ animation: pulse 2s ease-in-out infinite; }}
 </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>\U0001f52d PyScope Observation</h1>
+      <h1>PyScope Observation</h1>
       <div class="meta">
         <span><strong>Repository:</strong> {repository}</span>
         <span><strong>Observed:</strong> {observed_at}</span>
@@ -232,38 +202,38 @@ HTML_TEMPLATE = """<!doctype html>
 """
 
 METRIC_LABELS = {
-    "cross_domain_ratio": ("Cross-Domain Ratio", "purple"),
-    "intra_domain_ratio": ("Intra-Domain Ratio", "cyan"),
-    "leakage": ("Boundary Leakage", "pink"),
-    "cycle_density": ("Cycle Density", "amber"),
-    "observation_quality": ("Observation Quality", "emerald"),
-    "total_nodes": ("Total Nodes", "cyan"),
-    "total_edges": ("Total Edges", "cyan"),
-    "cross_domain_edges": ("Cross-Domain Edges", "purple"),
-    "intra_domain_edges": ("Intra-Domain Edges", "cyan"),
-    "unknown_unresolved_edges": ("Unresolved Edges", "amber"),
-    "unknown_dynamic_edges": ("Dynamic Edges", "amber"),
-    "regime": ("Detected Regime", "emerald"),
-    "distance_1": ("Distance to Nearest", "pink"),
-    "margin": ("Classification Margin", "amber"),
-    "confidence": ("Classification Confidence", "emerald"),
-    "nearest_regime": ("Nearest Regime", "cyan"),
-    "second_nearest_regime": ("Second Nearest", "muted"),
+    "cross_domain_ratio": ("Cross-Domain Ratio", "accent"),
+    "intra_domain_ratio": ("Intra-Domain Ratio", ""),
+    "leakage": ("Boundary Leakage", "warn"),
+    "cycle_density": ("Cycle Density", "warn"),
+    "observation_quality": ("Observation Quality", "success"),
+    "total_nodes": ("Total Nodes", ""),
+    "total_edges": ("Total Edges", ""),
+    "cross_domain_edges": ("Cross-Domain Edges", "accent"),
+    "intra_domain_edges": ("Intra-Domain Edges", ""),
+    "unknown_unresolved_edges": ("Unresolved Edges", "warn"),
+    "unknown_dynamic_edges": ("Dynamic Edges", "warn"),
+    "regime": ("Detected Regime", "success"),
+    "distance_1": ("Distance to Nearest", "warn"),
+    "margin": ("Classification Margin", "success"),
+    "confidence": ("Classification Confidence", "success"),
+    "nearest_regime": ("Nearest Regime", "accent"),
+    "second_nearest_regime": ("Second Nearest", ""),
 }
 
 REGIME_COLORS = {
-    "perfect": "#10B981",
-    "modular_small": "#8B5CF6",
-    "modular_large": "#8B5CF6",
-    "layered": "#06B6D4",
+    "perfect": "#22C55E",
+    "modular_small": "#38BDF8",
+    "modular_large": "#38BDF8",
+    "layered": "#60A5FA",
     "entangled_small": "#F59E0B",
     "entangled_large": "#F59E0B",
     "coupled": "#EF4444",
-    "leaky": "#F472B6",
-    "collapsed": "#DC2626",
+    "leaky": "#EC4899",
+    "collapsed": "#991B1B",
     "mixed": "#A78BFA",
     "pathological": "#7C2D12",
-    "acyclic_dominant": "#22D3EE",
+    "acyclic_dominant": "#67E8F9",
 }
 
 
@@ -274,11 +244,12 @@ def _format_value(v) -> str:
 
 
 def _metric_card(key: str, value) -> str:
-    label, css_class = METRIC_LABELS.get(key, (key.replace("_", " ").title(), "purple"))
+    label, css_class = METRIC_LABELS.get(key, (key.replace("_", " ").title(), "accent"))
+    cls_attr = f' class="value {css_class}"' if css_class else ' class="value"'
     return (
         f'<div class="card">'
         f'<div class="label">{label}</div>'
-        f'<div class="value {css_class}">{_format_value(value)}</div>'
+        f'<div{cls_attr}>{_format_value(value)}</div>'
         f'</div>'
     )
 
@@ -312,7 +283,7 @@ def write_html_report(
             with open(svg_path, "r", encoding="utf-8") as f:
                 svg_content = f.read()
         except OSError:
-            svg_content = '<p style="color: var(--accent-red);">SVG unavailable</p>'
+            svg_content = '<p style="color: var(--danger);">SVG unavailable</p>'
 
     metric_cards = "\n".join(_metric_card(k, v) for k, v in metrics.items())
     legend_items = "\n".join(

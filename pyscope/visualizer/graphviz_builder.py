@@ -1,8 +1,9 @@
 """Builds a Graphviz DOT representation of a C1 observation result.
 
-Uses the Minimax-inspired dark palette: deep purples, cyans and greens
-on near-black backgrounds. Node fill is colored by architectural regime;
-node size scales with ACP; edge thickness scales with DCI.
+Uses the PyScope Observatory palette: deep navy background, sky-blue
+accent, neutral grays for edges and labels. Node fill is colored by
+architectural regime; node size scales with ACP; edge thickness
+scales with DCI.
 """
 
 from __future__ import annotations
@@ -11,26 +12,28 @@ from typing import Dict
 
 from .schema import C1Result
 
-# Minimax dark palette
+# Observatory palette
 PALETTE = {
-    "bg": "#0D0D0F",
-    "fg": "#E0E0E8",
-    "muted": "#8A8A9A",
-    "border": "#2A2A35",
-    # Regime accent colors
-    "perfect": "#10B981",        # emerald
-    "modular": "#8B5CF6",        # violet
-    "layered": "#06B6D4",        # cyan
+    "bg": "#0A0E17",
+    "fg": "#F1F5F9",
+    "muted": "#94A3B8",
+    "border": "#1E293B",
+    "edge": "#475569",
+    "accent": "#38BDF8",
+    # Regime accent colors (muted, not neon)
+    "perfect": "#22C55E",        # green
+    "modular": "#38BDF8",        # sky blue
+    "layered": "#60A5FA",        # light blue
     "entangled": "#F59E0B",      # amber
     "coupled": "#EF4444",        # red
-    "leaky": "#F472B6",          # pink
-    "collapsed": "#DC2626",      # deep red
-    "mixed": "#A78BFA",          # light violet
+    "leaky": "#EC4899",          # pink
+    "collapsed": "#991B1B",      # deep red
+    "mixed": "#A78BFA",          # violet
     "pathological": "#7C2D12",   # dark amber
-    "acyclic": "#22D3EE",        # light cyan
+    "acyclic": "#67E8F9",        # light cyan
     "infrastructure": "#3B82F6", # blue
     "core": "#F97316",           # orange
-    "unclassified": "#6B7280",   # gray
+    "unclassified": "#64748B",   # slate
 }
 
 NODE_COLOR_MAP = {
@@ -53,23 +56,23 @@ NODE_COLOR_MAP = {
 
 
 def build_dot(model: C1Result) -> str:
-    """Return a DOT string rendering *model* with the Minimax dark palette."""
+    """Return a DOT string rendering *model* with the Observatory palette."""
     lines: list[str] = [
         "digraph G {",
-        '  bgcolor="#0D0D0F";',
-        '  fontcolor="#E0E0E8";',
+        '  bgcolor="#0A0E17";',
+        '  fontcolor="#F1F5F9";',
         '  fontname="ui-monospace, SF Mono, Consolas, monospace";',
         '  labeljust="l";',
         '  labelloc="t";',
-        f'  label=<<FONT POINT-SIZE="20" COLOR="#E0E0E8"><B>PyScope Observation</B></FONT><BR/>'
-        f'<FONT POINT-SIZE="10" COLOR="#8A8A9A">{model.repository or "unknown"}</FONT>>;',
+        f'  label=<<FONT POINT-SIZE="18" COLOR="#F1F5F9"><B>PyScope Observation</B></FONT><BR/>'
+        f'<FONT POINT-SIZE="10" COLOR="#94A3B8">{model.repository or "unknown"}</FONT>>;',
         '  pad="0.5";',
         '  nodesep="0.6";',
         '  ranksep="0.8";',
         '  splines="true";',
         '  overlap="false";',
-        '  node [shape=box, style="rounded,filled", fontname="ui-monospace, SF Mono, Consolas, monospace", fontcolor="#E0E0E8", color="#2A2A35"];',
-        '  edge [color="#06B6D4", arrowsize="0.7", fontname="ui-monospace, SF Mono, Consolas, monospace"];',
+        '  node [shape=box, style="rounded,filled", fontname="ui-monospace, SF Mono, Consolas, monospace", fontcolor="#F1F5F9", color="#1E293B"];',
+        '  edge [color="#475569", arrowsize="0.7", fontname="ui-monospace, SF Mono, Consolas, monospace"];',
     ]
 
     for node in model.nodes:
@@ -81,12 +84,11 @@ def build_dot(model: C1Result) -> str:
                 size = min(2.5, max(0.4, float(node.acp) * 0.6 + 0.4))
             except (TypeError, ValueError):
                 size = 1.0
-        # Tooltip with details
         tooltip = f"{node.label} | regime={regime} | acp={node.acp}"
         lines.append(
             f'  "{node.id}" [label=<<B>{node.label}</B><BR/>'
-            f'<FONT POINT-SIZE="8" COLOR="#8A8A9A">{regime}</FONT>>, '
-            f'fillcolor="{color}", color="#2A2A35", '
+            f'<FONT POINT-SIZE="8" COLOR="#94A3B8">{regime}</FONT>>, '
+            f'fillcolor="{color}", color="#1E293B", '
             f'width="{size}", height="{size * 0.6}", '
             f'tooltip="{tooltip}"];'
         )
@@ -98,12 +100,12 @@ def build_dot(model: C1Result) -> str:
                 pen = max(0.5, min(4.0, float(edge.dci)))
             except (TypeError, ValueError):
                 pen = 1.0
-        # Color edges by coupling intensity
-        edge_color = "#06B6D4"
+        # Highlight strong couplings with the accent color
+        edge_color = "#475569"
         if pen > 3.0:
             edge_color = "#EF4444"
         elif pen > 2.0:
-            edge_color = "#F59E0B"
+            edge_color = "#38BDF8"
         lines.append(
             f'  "{edge.src}" -> "{edge.dst}" [penwidth="{pen}", color="{edge_color}"];'
         )
@@ -115,8 +117,8 @@ def build_dot(model: C1Result) -> str:
 def build_palette_legend() -> str:
     """Return a small DOT fragment rendering the color legend."""
     lines = ["digraph legend {"]
-    lines.append('  bgcolor="#0D0D0F"; fontcolor="#E0E0E8";')
-    lines.append('  node [shape=box, style="rounded,filled", fontcolor="#E0E0E8", color="#2A2A35"];')
+    lines.append('  bgcolor="#0A0E17"; fontcolor="#F1F5F9";')
+    lines.append('  node [shape=box, style="rounded,filled", fontcolor="#F1F5F9", color="#1E293B"];')
     for label, color in NODE_COLOR_MAP.items():
         lines.append(
             f'  "{label}" [label="{label}", fillcolor="{color}"];'
