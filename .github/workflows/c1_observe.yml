@@ -1,0 +1,60 @@
+name: Run Pyscope
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'Project name to observe'
+        required: true
+        default: 'Django'
+      repo_url:
+        description: 'Repository URL to use for the observation'
+        required: true
+        default: 'https://github.com/django/django.git'
+      workdir_name:
+        description: 'Workdir name used by the observer'
+        required: false
+        default: 'c1_django_remote'
+
+jobs:
+  c1_observe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install minimal dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy networkx typer rich pydantic
+
+      - name: Run C1 observer
+        env:
+          PROJECT: ${{ github.event.inputs.project }}
+          REPO_URL: ${{ github.event.inputs.repo_url }}
+          WORKDIR: ${{ github.event.inputs.workdir_name }}
+        run: |
+          set -e
+          python -m tools.c1_observe "$PROJECT" "$REPO_URL" "$WORKDIR"
+
+      - name: Normalize project name (lowercase)
+        id: normalize
+        env:
+          PROJECT: ${{ github.event.inputs.project }}
+        run: |
+          project_lower=$(echo "$PROJECT" | tr '[:upper:]' '[:lower:]')
+          echo "project_lower=$project_lower" >> $GITHUB_OUTPUT
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: c1-results-${{ github.run_id }}
+          path: |
+            c1_${{ steps.normalize.outputs.project_lower }}_result.json
+            ${{ github.event.inputs.workdir_name }}
