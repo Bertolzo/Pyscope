@@ -1,4 +1,4 @@
-# Architectural Governance System (AGS)
+# Architectural Observatory
 
 [![GitHub Actions](https://img.shields.io/github/actions/workflow/status/Bertolzo/architectural-governance/.github/workflows/c1_observe.yml?branch=main)](https://github.com/Bertolzo/architectural-governance/actions)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/downloads/release/python-3120/)
