@@ -1,139 +1,142 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/python-3.12+-blue?style=flat&logo=python" alt="Python 3.12+">
-  <img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="MIT License">
-  <img src="https://img.shields.io/badge/tests-277%20passed-brightgreen?style=flat" alt="277 tests passing">
-  <img src="https://img.shields.io/badge/version-2.0.0-orange?style=flat" alt="v2.0.0">
+  <img src="assets/header.svg" alt="PyScope — Architectural Observatory" width="100%">
 </p>
 
-<h1 align="center">🔭 PyScope</h1>
-<p align="center"><strong>Observatório Arquitetural para Python</strong><br>
-Observação estática de grafos de imports · Métricas FASM · Artefatos auditáveis · Visualização</p>
+<p align="center">
+  <a href="https://github.com/Bertolzo/Pyscope/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-10B981?style=for-the-badge" alt="License"></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.12+-8B5CF6?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.12+"></a>
+  <a href="#testes"><img src="https://img.shields.io/badge/tests-277%20passed-10B981?style=for-the-badge" alt="277 tests"></a>
+  <a href="#escopo"><img src="https://img.shields.io/badge/FASM-v2.0-06B6D4?style=for-the-badge" alt="FASM v2.0"></a>
+  <a href="https://github.com/Bertolzo/Pyscope/actions"><img src="https://img.shields.io/badge/CI-GitHub_Actions-F59E0B?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/observation-not_inference-8A8A9A?style=flat-square" alt="observation not inference">
+  <img src="https://img.shields.io/badge/static-AST--based-8A8A9A?style=flat-square" alt="static AST-based">
+  <img src="https://img.shields.io/badge/regimes-11_canonical-8A8A9A?style=flat-square" alt="11 regimes">
+  <img src="https://img.shields.io/badge/reproducible-100%25-8A8A9A?style=flat-square" alt="100% reproducible">
+</p>
+
+<p align="center">
+  <sub>
+    <a href="#filosofia">Filosofia</a> &middot;
+    <a href="#arquitetura">Arquitetura</a> &middot;
+    <a href="#m\u00f3dulos">M\u00f3dulos</a> &middot;
+    <a href="#escopo">Escopo</a> &middot;
+    <a href="#quick-start">Quick Start</a> &middot;
+    <a href="#uso">Uso</a> &middot;
+    <a href="#design-decisions">Design</a> &middot;
+    <a href="#testes">Testes</a>
+  </sub>
+</p>
 
 ---
 
-## Índice
+## <span style="color:#8B5CF6">Filosofia</span>
 
-- [Filosofia](#filosofia)
-- [Arquitetura](#arquitetura)
-- [Módulos](#módulos)
-  - [AGS — Architectural Governance System](#ags--architectural-governance-system)
-  - [PyScope Visualizer](#pyscope-visualizer)
-  - [Tools](#tools)
-- [Escopo](#escopo)
-- [Quick Start](#quick-start)
-- [Uso](#uso)
-  - [Observação C1](#observação-c1)
-  - [Visualizador](#visualizador)
-  - [CLI AGS](#cli-ags)
-- [Ciclo de vida de uma observação](#ciclo-de-vida-de-uma-observação)
-- [Design Decisions](#design-decisions)
-- [Testes](#testes)
-- [GitHub Actions](#github-actions)
-- [Branching](#branching)
-- [Contribuição](#contribuição)
-- [Estrutura do Repositório](#estrutura-do-repositório)
+> **PyScope n\u00e3o adivinha. PyScope observa.**
 
----
+PyScope \u00e9 uma ferramenta de **observa\u00e7\u00e3o**, n\u00e3o de governan\u00e7a. Ela existe porque a maioria das ferramentas de arquitetura ainda **mistura m\u00e9tricas com infer\u00eancias** \u2014 entregando opini\u00f5es onde deveriam entregar dados.
 
-## Filosofia
+O projeto se apoia em **tr\u00eas artefatos formais** que n\u00e3o podem ser confundidos:
 
-PyScope é uma ferramenta de **observação**, não de governança. Ela existe porque a maioria das ferramentas de arquitetura de software ainda **mistura métricas com inferências** — entregando opiniões onde deveriam entregar dados.
+<table>
+<tr>
+<th style="color:#8B5CF6">FASM</th>
+<th style="color:#06B6D4">AGS</th>
+<th style="color:#10B981">PyScope</th>
+</tr>
+<tr>
+<td><strong>Modelo formal</strong></td>
+<td><strong>Implementa\u00e7\u00e3o</strong></td>
+<td><strong>Observat\u00f3rio</strong></td>
+</tr>
+<tr>
+<td>Ontologia, teoria, axiomas, m\u00e9tricas, invariantes</td>
+<td>GraphBuilder, parsers, engine de m\u00e9tricas, banco</td>
+<td>ObservationSnapshot, RegimeClassification, protocolos C0/C1/C2</td>
+</tr>
+<tr>
+<td><em>o que</em> observar</td>
+<td><em>como</em> observar</td>
+<td>observa\u00e7\u00e3o \u2192 FASM \u2192 evid\u00eancia</td>
+</tr>
+</table>
 
-**PyScope não adivinha. PyScope observa.**
-
-O projeto se apoia em três artefatos formais que **não podem ser confundidos**:
-
-| Artefato | Papel | O que define |
-|----------|-------|-------------|
-| **FASM** | Modelo formal | Ontologia, teoria, axiomas, métricas, invariantes — *o que* observar |
-| **AGS** | Implementação | GraphBuilder, parsers, engine de métricas, banco — *como* observar |
-| **PyScope** | Observatório | ObservationSnapshot, RegimeClassification, protocolos C0/C1/C2 — conecta observação → FASM → evidência |
-
-> FASM não contém código Python. AGS não cria conceitos — apenas implementa. PyScope não cria teoria — apenas observa.
+> FASM n\u00e3o cont\u00eam c\u00f3digo Python. AGS n\u00e3o cria conceitos \u2014 apenas implementa. PyScope n\u00e3o cria teoria \u2014 apenas observa.
 
 ---
 
-## Arquitetura
+## <span style="color:#06B6D4">Arquitetura</span>
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                           ENTRY POINTS                                       │
-│                                                                            │
-│   tools/c1_observe.py     python -m ags          pyscope.visualizer        │
-│   (observação remota)     (CLI orquestrada)      (visualização C1)         │
-└──────────┬──────────────────────┬──────────────────────┬────────────────────┘
-           │                      │                      │
-           ▼                      ▼                      │
-┌──────────────────────────────────────────────┐         │
-│            AGS ORCHESTRATOR                   │         │
-│         ags/orchestrator.py :: AGS            │         │
-│                                              │         │
-│  ┌─────────┐  ┌──────────┐  ┌────────────┐   │         │
-│  │GRAPH    │→ │STRUCTURAL│→ │ COUPLING   │   │         │
-│  │Builder  │  │Analyzer  │  │ Analyzer   │   │         │
-│  │Metrics  │  │Snapshot  │  │ Report     │   │         │
-│  │Comm.    │  │          │  │            │   │         │
-│  └────┬────┘  └────┬─────┘  └──────┬─────┘   │         │
-│       │            │               │         │         │
-│       ▼            ▼               ▼         │         │
-│  ┌─────────┐  ┌──────────┐  ┌────────────┐   │         │
-│  │EVOLUTION│→ │PREDICTION│→ │GOVERNANCE  │   │         │
-│  │Analyzer │  │Engine    │  │Engine      │   │         │
-│  │Drift    │  │Forecast  │  │Guardian    │   │         │
-│  └────┬────┘  └────┬─────┘  └──────┬─────┘   │         │
-│       │            │               │         │         │
-└───────┼────────────┼───────────────┼─────────┘         │
-        │            │               │                   │
-        ▼            ▼               ▼                   ▼
-┌──────────────────────────────────────────┐  ┌─────────────────────┐
-│         MODELS + OBSERVATION             │  │   VISUALIZADOR      │
-│                                          │  │                     │
-│  ArchitecturalStateVector (10-d embed)   │  │  C1Result JSON      │
-│  ArchitecturalTwin (gêmeo digital)       │  │  → Graphviz DOT     │
-│  ObservationSnapshot → RegimeClassif.    │  │  → SVG/PNG          │
-│                                          │  │  → HTML report      │
-└────────────────┬─────────────────────────┘  └─────────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────────────┐  ┌─────────────────────┐
-│         STORAGE (SQLite)                 │  │   SYNTHETIC (C0.0)  │
-│                                          │  │                     │
-│  Database (WAL mode)                     │  │  FixtureSpec        │
-│  ├─ SnapshotRepository                   │  │  → RegimeAwareGen   │
-│  ├─ CouplingRepository                   │  │  → 11 regimes       │
-│  ├─ EvolutionRepository                  │  │  → CIR-1/2/3/4      │
-│  └─ GovernanceRepository                 │  │                     │
-└──────────────────────────────────────────┘  └─────────────────────┘
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                            ENTRY POINTS                                     ║
+║                                                                            ║
+║   tools/c1_observe.py      python -m ags           pyscope.visualizer      ║
+║   (observação remota)      (CLI orquestrada)       (dashboard dark)        ║
+╚════════════╤═════════════════╤═══════════════════════╤═══════════════════════╝
+             │                 │                       │
+             ▼                 ▼                       │
+   ┌─────────────────────────────────────────┐         │
+   │         AGS ORCHESTRATOR                │         │
+   │      ags/orchestrator.py :: AGS         │         │
+   │                                         │         │
+   │   ┌────────┐  ┌──────────┐  ┌────────┐  │         │
+   │   │ GRAPH  │─▶│STRUCTURAL│─▶│COUPLING│  │         │
+   │   └────┬───┘  └────┬─────┘  └───┬────┘  │         │
+   │        │           │            │       │         │
+   │        ▼           ▼            ▼       │         │
+   │   ┌─────────┐  ┌──────────┐  ┌────────┐  │         │
+   │   │EVOLUTION│─▶│PREDICTION│─▶│GOVERN. │  │         │
+   │   └────┬────┘  └────┬─────┘  └───┬────┘  │         │
+   └────────┼────────────┼────────────┼────────┘         │
+            │            │            │                  │
+            ▼            ▼            ▼                  ▼
+   ┌──────────────────────────┐  ┌────────────────────────────┐
+   │   MODELS + OBSERVATION   │  │       VISUALIZADOR         │
+   │                          │  │                            │
+   │  ArchitecturalTwin       │  │  C1Result JSON             │
+   │  ObservationSnapshot     │  │  → DOT (paleta Minimax)    │
+   │  RegimeClassification    │  │  → SVG                     │
+   │                          │  │  → HTML dashboard dark     │
+   └────────────┬─────────────┘  └────────────────────────────┘
+                │
+                ▼
+   ┌──────────────────────────┐  ┌────────────────────────────┐
+   │     STORAGE (SQLite)     │  │     SYNTHETIC (C0.0)       │
+   │   Database (WAL mode)    │  │  11 regimes canônicos      │
+   │   4 repositórios         │  │  CIR-1/2/3/4 invariantes   │
+   └──────────────────────────┘  └────────────────────────────┘
 ```
 
-### Fluxo de dados principal
+### <span style="color:#10B981">Fluxo de dados</span>
 
 ```
-[AST Python] ──► GraphBuilder ──► ArchitecturalGraph (NetworkX)
+[AST Python] ──▶ GraphBuilder ──▶ ArchitecturalGraph (NetworkX)
                   │
-                  ├──► cycle_density, dependency_density, drift
-                  ├──► detect_communities, contamination
+                  ├──▶ cycle_density, dependency_density, drift
+                  ├──▶ detect_communities, contamination
                   │
                   ▼
             ObservationSnapshot
                   │
-                  ├──► metrics [0,1]: ACP, DCI, leakage, cycle density
-                  ├──► classify_from_snapshot() → RegimeClassification
+                  ├──▶ metrics [0,1]: ACP, DCI, leakage, cycle density
+                  ├──▶ classify_from_snapshot() → RegimeClassification
                   │      └── contra REGIME_TAXONOMY (11 atratores)
                   │
                   ▼
-            Relatório JSON + Visualizador HTML
+            Relatório JSON + Dashboard HTML dark
 ```
 
 ---
 
-## Módulos
+## <span style="color:#10B981">Módulos</span>
 
 ### AGS — Architectural Governance System
 
-O núcleo do PyScope. Organizado em 6 camadas que formam um pipeline de observação arquitetural.
-
-#### `ags/core/graph/` — Grafo Arquitetural
+<details>
+<summary><strong style="color:#8B5CF6">ags/core/graph/ — Grafo Arquitetural</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -144,7 +147,10 @@ O núcleo do PyScope. Organizado em 6 camadas que formam um pipeline de observa�
 | `graph_drift()` | Distância estrutural entre duas versões do grafo |
 | `detect_communities()` | Detecção Louvain + contaminação entre fronteiras |
 
-#### `ags/core/observation/` — Observação C1
+</details>
+
+<details>
+<summary><strong style="color:#06B6D4">ags/core/observation/ — Observação C1</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -153,14 +159,20 @@ O núcleo do PyScope. Organizado em 6 camadas que formam um pipeline de observa�
 | `RegimeClassification` | Classificação por distância euclidiana aos 11 regimes canônicos |
 | `classify_from_snapshot()` | Retorna regime, nearest, second_nearest, margin, confidence |
 
-#### `ags/core/models/` — Modelos de Estado
+</details>
+
+<details>
+<summary><strong style="color:#10B981">ags/core/models/ — Modelos de Estado</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
 | `ArchitecturalStateVector` | Vetor canônico L3 com entropia, acoplamento, CRI, AGP (10 dimensões) |
 | `ArchitecturalTwin` | Gêmeo digital: estado + evolução + predição + governança |
 
-#### `ags/synthetic/` — Validação C0.0
+</details>
+
+<details>
+<summary><strong style="color:#F59E0B">ags/synthetic/ — Validação C0.0</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -172,14 +184,20 @@ O núcleo do PyScope. Organizado em 6 camadas que formam um pipeline de observa�
 | **CIR-3** | Cobertura do espaço de grafos (topologia, densidade, grau) |
 | **CIR-4** | Ortogonalidade das métricas primitivas |
 
-#### `ags/intelligence/` — Evolução e Predição
+</details>
+
+<details>
+<summary><strong style="color:#F472B6">ags/intelligence/ — Evolução e Predição</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
 | `EvolutionAnalyzer` | Deltas entre snapshots, gradiente de entropia (velocidade/aceleração), half-life |
 | `PredictionEngine` | Projeção de entropia/CRI em 30/60/90d, confiança, risco de colapso |
 
-#### `ags/storage/` — Persistência
+</details>
+
+<details>
+<summary><strong style="color:#3B82F6">ags/storage/ — Persistência</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -189,25 +207,36 @@ O núcleo do PyScope. Organizado em 6 camadas que formam um pipeline de observa�
 | `EvolutionRepository` | Gradiente de entropia, drift, half-life |
 | `GovernanceRepository` | Eventos de governança (merge gates, violações) |
 
----
+</details>
 
-### PyScope Visualizer
+### <span style="color:#8B5CF6">PyScope Visualizer</span>
 
-Converte resultados de observação C1 em artefatos visuais.
+Converte resultados de observação C1 em artefatos visuais com **paleta Minimax dark**.
 
 | Componente | Responsabilidade |
 |------------|-----------------|
 | `schema.py` | Schemas `Node`, `Edge`, `C1Result` com `from_json()` |
 | `graphviz_builder.py` | Constrói string DOT com cor por regime, espessura por ACP/DCI |
 | `renderer.py` | Renderiza DOT → SVG/PNG via Graphviz |
-| `html_report.py` | Gera página HTML com SVG embutido + tabela de métricas |
+| `html_report.py` | Dashboard HTML dark com cards, gradientes e legend interativo |
 | `cli.py` | CLI: `python -m pyscope.visualizer --input-json ... --output-dir ...` |
 
----
+**Paleta de cores Minimax aplicada ao grafo:**
+
+<table>
+<tr><th>Regime</th><th>Cor</th><th>Uso</th></tr>
+<tr><td><code>perfect</code></td><td><span style="color:#10B981">■</span> #10B981</td><td>emerald</td></tr>
+<tr><td><code>modular_*</code></td><td><span style="color:#8B5CF6">■</span> #8B5CF6</td><td>violet</td></tr>
+<tr><td><code>layered</code></td><td><span style="color:#06B6D4">■</span> #06B6D4</td><td>cyan</td></tr>
+<tr><td><code>entangled_*</code></td><td><span style="color:#F59E0B">■</span> #F59E0B</td><td>amber</td></tr>
+<tr><td><code>coupled</code></td><td><span style="color:#EF4444">■</span> #EF4444</td><td>red</td></tr>
+<tr><td><code>leaky</code></td><td><span style="color:#F472B6">■</span> #F472B6</td><td>pink</td></tr>
+<tr><td><code>collapsed</code></td><td><span style="color:#DC2626">■</span> #DC2626</td><td>deep red</td></tr>
+<tr><td><code>mixed</code></td><td><span style="color:#A78BFA">■</span> #A78BFA</td><td>light violet</td></tr>
+<tr><td><code>acyclic_dominant</code></td><td><span style="color:#22D3EE">■</span> #22D3EE</td><td>light cyan</td></tr>
+</table>
 
 ### Tools
-
-Scripts operacionais para observação remota e utilitários.
 
 | Script | Propósito |
 |--------|-----------|
@@ -216,15 +245,13 @@ Scripts operacionais para observação remota e utilitários.
 | `verify_baseline.py` | Verifica integridade do baseline do projeto |
 | `remote_runner.py` | Execução remota de observações |
 | `resource_adapter.py` | Adaptador de recursos (local vs cloud) |
-| `freetier_adapter.py` | Gerencia cache de promoções free tier |
-| `mcp_register.py` | Registro de MCP providers |
 | `providers/` | Providers cloud (AWS, OCI, Oracle) |
 
 ---
 
-## Escopo
+## <span style="color:#F472B6">Escopo</span>
 
-### ✅ Em escopo
+### <span style="color:#10B981">✅ Em escopo</span>
 
 - Projetos Python com estrutura de pacotes padrão
 - Análise **estática** do grafo de imports (AST)
@@ -232,11 +259,11 @@ Scripts operacionais para observação remota e utilitários.
 - Classificação em 11 regimes arquiteturais
 - Observação remota de repositórios (C1)
 - Resultados auditáveis em JSON
-- Visualização Graphviz + relatório HTML
+- Visualização Graphviz + dashboard HTML dark (paleta Minimax)
 - Geração sintética para validação de invariantes (C0.0)
 - Pipeline GitHub Actions para CI/CD
 
-### ❌ Fora de escopo (deliberadamente)
+### <span style="color:#EF4444">❌ Fora de escopo (deliberadamente)</span>
 
 - Análise dinâmica de runtime (profiling, tracing)
 - Linguagens que não sejam Python
@@ -247,7 +274,7 @@ Scripts operacionais para observação remota e utilitários.
 
 ---
 
-## Quick Start
+## <span style="color:#06B6D4">Quick Start</span>
 
 ```bash
 # Clone
@@ -260,7 +287,7 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 
 # Instalação
-python -m pip install -e .[dev,intelligence]
+python -m pip install -e ".[dev,intelligence]"
 
 # Testes (277 testes — deve passar limpo)
 python -m pytest -q --no-cov
@@ -268,9 +295,9 @@ python -m pytest -q --no-cov
 
 ---
 
-## Uso
+## <span style="color:#8B5CF6">Uso</span>
 
-### Observação C1
+### <span style="color:#10B981">Observação C1</span>
 
 Observe a arquitetura de qualquer repositório Python público:
 
@@ -298,9 +325,9 @@ Saída esperada:
 └── ✅ Artefato: c1_requests_result.json
 ```
 
-### Visualizador
+### <span style="color:#06B6D4">Visualizador</span>
 
-Converta um resultado C1 em grafos e HTML:
+Converta um resultado C1 em grafo + dashboard HTML dark:
 
 ```bash
 python -m pyscope.visualizer \
@@ -312,15 +339,22 @@ Gera:
 
 ```
 out/
-├── graph.dot        # Grafo em formato DOT
+├── graph.dot        # Grafo em formato DOT (paleta Minimax)
 ├── graph.svg        # Renderização SVG
 ├── graph.png        # Renderização PNG
-└── index.html       # Relatório HTML com SVG + métricas
+└── index.html       # Dashboard HTML dark (cards, gradientes, legend)
 ```
 
-### CLI AGS
+O dashboard HTML tem:
 
-O núcleo AGS também pode ser usado via CLI:
+- **Header** com gradiente roxo→ciano→verde
+- **Cards** coloridos por tipo de métrica (purple/cyan/emerald/amber/pink)
+- **SVG do grafo** com fundo `#0D0D0F` e nós coloridos por regime
+- **Legend interativa** com swatches de cores
+- **Hover effects** sutis (translateY, shadow roxo)
+- **Footer** com hash do artefato gerado
+
+### <span style="color:#F59E0B">CLI AGS</span>
 
 ```bash
 # Analisar um projeto local
@@ -335,7 +369,7 @@ ags forecast
 
 ---
 
-## Ciclo de vida de uma observação
+## <span style="color:#F59E0B">Ciclo de vida de uma observação</span>
 
 ```
 1. CLONE
@@ -365,27 +399,59 @@ ags forecast
          │
 6. REPORT
    → JSON com métricas + classificação
-   → Visualizador: DOT → SVG → HTML
+   → Visualizador: DOT (paleta Minimax) → SVG → Dashboard HTML dark
 ```
 
 ---
 
-## Design Decisions
+## <span style="color:#A78BFA">Design Decisions</span>
 
-| Decisão | Justificativa |
-|---------|---------------|
-| **Métricas [0,1] em vez de scores [0,100]** | Alinhamento com o modelo formal FASM; permite comparação direta com a taxonomia sintética |
-| **cycle_density = edges_in_cycles / total_edges** | Mede acoplamento cíclico real (não complexidade ciclomática) |
-| **intra_domain_ratio direto (não 1 - cross)** | Revela gaps de classificação quando ambos são baixos |
-| **Self-loops ignorados** | Não representam dependência arquitetural entre entidades distintas |
-| **confidence = quality / (1 + distance)** | Mapeia qualquer distância a (0, 1]; quality penaliza observações parciais |
-| **Parser via AST (não regex)** | AST capta a semântica real do código; regex falha em imports condicionais e dinâmicos |
-| **SQLite WAL mode** | Leitores não bloqueiam escritores; ideal para pipelines CI |
-| **Twin digital separado do snapshot** | Snapshot é o estado atual; twin é o agregado estado + histórico + predição |
+<table>
+<tr>
+<th style="color:#8B5CF6">Decisão</th>
+<th style="color:#06B6D4">Justificativa</th>
+</tr>
+<tr>
+<td><strong>Métricas [0,1] em vez de scores [0,100]</strong></td>
+<td>Alinhamento com o modelo formal FASM; permite comparação direta com a taxonomia sintética</td>
+</tr>
+<tr>
+<td><strong>cycle_density = edges_in_cycles / total_edges</strong></td>
+<td>Mede acoplamento cíclico real (não complexidade ciclomática)</td>
+</tr>
+<tr>
+<td><strong>intra_domain_ratio direto (não 1 - cross)</strong></td>
+<td>Revela gaps de classificação quando ambos são baixos</td>
+</tr>
+<tr>
+<td><strong>Self-loops ignorados</strong></td>
+<td>Não representam dependência arquitetural entre entidades distintas</td>
+</tr>
+<tr>
+<td><strong>confidence = quality / (1 + distance)</strong></td>
+<td>Mapeia qualquer distância a (0, 1]; quality penaliza observações parciais</td>
+</tr>
+<tr>
+<td><strong>Parser via AST (não regex)</strong></td>
+<td>AST capta a semântica real do código; regex falha em imports condicionais e dinâmicos</td>
+</tr>
+<tr>
+<td><strong>SQLite WAL mode</strong></td>
+<td>Leitores não bloqueiam escritores; ideal para pipelines CI</td>
+</tr>
+<tr>
+<td><strong>Twin digital separado do snapshot</strong></td>
+<td>Snapshot é o estado atual; twin é o agregado estado + histórico + predição</td>
+</tr>
+<tr>
+<td><strong>Paleta dark Minimax no visualizador</strong></td>
+<td>Contraste forte, hierarquia visual clara, identidade diferenciada</td>
+</tr>
+</table>
 
 ---
 
-## Testes
+## <span style="color:#22D3EE">Testes</span>
 
 O projeto possui **277 testes** organizados em:
 
@@ -414,7 +480,7 @@ python -m pytest tests/test_graph.py tests/test_observation.py -v
 
 ---
 
-## GitHub Actions
+## <span style="color:#06B6D4">GitHub Actions</span>
 
 | Workflow | Trigger | O que faz |
 |----------|---------|-----------|
@@ -423,7 +489,7 @@ python -m pytest tests/test_graph.py tests/test_observation.py -v
 
 ---
 
-## Branching
+## <span style="color:#10B981">Branching</span>
 
 | Branch | Propósito |
 |--------|-----------|
@@ -437,7 +503,7 @@ python -m pytest tests/test_graph.py tests/test_observation.py -v
 
 ---
 
-## Contribuição
+## <span style="color:#8B5CF6">Contribuição</span>
 
 1. Abra um issue descrevendo o caso de uso
 2. Escolha a branch adequada conforme a branching strategy
@@ -454,137 +520,55 @@ python tools/verify_baseline.py
 
 ---
 
-## Estrutura do Repositório
+## <span style="color:#22D3EE">Estrutura do Repositório</span>
 
 ```
 ags/                              # Núcleo AGS
 ├── __init__.py
 ├── __main__.py                   # Entry point: python -m ags
 ├── orchestrator.py               # Pipeline de 6 camadas
-├── cli/
-│   ├── __init__.py
-│   └── main.py                   # CLI Typer (analyze, history, forecast)
-├── core/
-│   ├── __init__.py
-│   ├── coupling/
-│   │   ├── analyzer.py           # CouplingAnalyzer
-│   │   └── snapshot.py
-│   ├── governance/
-│   │   ├── engine.py             # GovernanceEngine
-│   │   └── guardian.py           # ArchitecturalGuardian
-│   ├── graph/
-│   │   ├── architectural_graph.py # ArchitecturalGraph (NetworkX)
-│   │   ├── builders.py           # GraphBuilder (AST parser)
-│   │   ├── communities.py        # Louvain detection
-│   │   └── metrics.py            # cycle_density, drift, fan_in/out
-│   ├── models/
-│   │   ├── state_vector.py       # ArchitecturalStateVector (10-d)
-│   │   └── twin.py               # ArchitecturalTwin
-│   ├── observation/
-│   │   ├── primitives.py         # ObservationSnapshot
-│   │   └── classification.py     # RegimeClassification
-│   └── structural/
-│       ├── analyzer.py           # StructuralAnalyzer
-│       └── snapshot.py           # StructuralSnapshot
-├── intelligence/
-│   ├── __init__.py
-│   ├── evolution/
-│   │   ├── analyzer.py           # EvolutionAnalyzer, drift
-│   │   └── models.py             # EntropyDynamics
-│   └── prediction/
-│       ├── engine.py             # PredictionEngine (30/60/90d)
-│       └── __init__.py
-├── storage/
-│   ├── database.py               # SQLite WAL
-│   └── repositories/
-│       ├── base.py               # BaseRepository (CRUD genérico)
-│       ├── snapshot_repo.py
-│       ├── coupling_repo.py
-│       ├── evolution_repo.py
-│       └── governance_repo.py
-└── synthetic/
-    ├── __init__.py
-    ├── coverage_audit.py         # CIR-3
-    ├── generator.py              # RegimeAwareGraphGenerator
-    ├── graph_set.py              # SyntheticGraphSet
-    ├── orthogonality.py          # CIR-4
-    ├── perturbation.py           # CIR-2
-    ├── regimes.py                # REGIME_TAXONOMY (11 regimes)
-    └── spec.py                   # FixtureSpec
+├── cli/                          # CLI Typer (analyze, history, forecast)
+├── core/                         # Core: graph, observation, models, structural, coupling, governance
+├── intelligence/                 # Evolução e predição
+├── storage/                      # SQLite WAL + 4 repositórios
+└── synthetic/                    # Geração sintética (11 regimes, CIR-1/2/3/4)
 
-pyscope/                          # Visualizador
+pyscope/                          # Visualizador (paleta Minimax)
 ├── __init__.py
-├── core/
-│   └── __init__.py
 └── visualizer/
-    ├── __init__.py
     ├── cli.py                    # CLI entry point
-    ├── graphviz_builder.py       # DOT builder
-    ├── html_report.py            # HTML report generator
+    ├── graphviz_builder.py       # DOT builder (paleta Minimax)
+    ├── html_report.py            # Dashboard HTML dark
     ├── renderer.py               # DOT → SVG/PNG
     └── schema.py                 # C1Result, Node, Edge
+
+assets/                           # Recursos visuais
+└── header.svg                    # Banner SVG do README
 
 tools/                            # Scripts operacionais
 ├── c1_observe.py                 # Observação C1 remota
 ├── c1_observe_requests.py        # Exemplo com requests
-├── verify_baseline.py            # Verificação de baseline
-├── remote_runner.py              # Runner remoto
-├── resource_adapter.py           # Adaptador de recursos
-├── freetier_adapter.py           # Cache free tier
-├── mcp_register.py               # Registro MCP
+├── verify_baseline.py
+├── remote_runner.py
+├── resource_adapter.py
 ├── providers/                    # AWS, OCI, Oracle
 └── ...
 
 docs/                             # Modelo científico e limitações
-├── FASM.md                       # Modelo formal completo
-├── ARCHITECTURE.md               # Arquitetura do sistema
-├── LIMITATIONS.md                # Limitações conhecidas
-├── METRICS.md                    # Definição das métricas
-├── THEORY.md                     # Base teórica
-├── MEASUREMENT_THEORY.md         # Teoria da medição
-├── CALIBRATION.md                # Calibração empírica
-├── STATE_VECTOR.md               # Vetor de estado
-├── INVARIANTS.md                 # Invariantes formais
-├── C0_RESULTS.md                 # Resultados C0.0
-├── C1_RESULTS.md                 # Resultados C1.0
-└── ... (+20 arquivos)
-
-tests/                            # Testes
-├── conftest.py
-├── fixtures/
-│   ├── c1_example.json
-│   └── sample_monolith/          # Projeto fixture
-├── test_baseline.py
-├── test_classification.py
-├── test_graph.py
-├── test_graph_invariants.py
-├── test_graph_validation.py
-├── test_math_invariants.py
-├── test_observation.py
-├── test_synthetic_c00.py
-├── test_snapshot_consistency.py
-├── test_visualizer/
-│   ├── test_builder.py
-│   ├── test_renderer.py
-│   └── test_schema.py
-└── ...
-
-.github/                          # GitHub config
-├── workflows/
-│   ├── c1_observe.yml
-│   └── visualizer-ci.yml
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md
-├── PULL_REQUEST_TEMPLATE.md
-└── ISSUE_TEMPLATE/
-    ├── bug_report.md
-    └── feature_request.md
+tests/                            # 277 testes
+.github/                          # Workflows + templates
 ```
 
 ---
 
 <p align="center">
-  <strong>PyScope</strong> — transformando arquitetura Python em<br>
+  <img src="https://img.shields.io/badge/PyScope-v2.0.0-8B5CF6?style=for-the-badge" alt="v2.0.0">
+  <img src="https://img.shields.io/badge/observation-not_inference-06B6D4?style=for-the-badge" alt="observation">
+  <img src="https://img.shields.io/badge/data-not_opinion-10B981?style=for-the-badge" alt="data">
+</p>
+
+<p align="center">
+  <strong>PyScope</strong> &mdash; transformando arquitetura Python em<br>
   <em>decisões técnicas fundadas, auditáveis e reproduzíveis.</em><br><br>
   <sub>Observação, não adivinhação. Dados, não opiniões.</sub>
 </p>
