@@ -1,0 +1,31 @@
+name: Visualizer CI
+
+on:
+  push:
+    branches:
+      - 'scope/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install graphviz
+      - name: Run visualizer example
+        run: |
+          python -m pyscope.visualizer --input-json tests/fixtures/c1_example.json --output-dir out/visual
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: visualizer-artifacts
+          path: out/**

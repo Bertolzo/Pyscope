@@ -1,125 +1,45 @@
-# Architectural Observatory
+# PyScope
 
-[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/Bertolzo/architectural-governance/.github/workflows/c1_observe.yml?branch=main)](https://github.com/Bertolzo/architectural-governance/actions)
-[![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/downloads/release/python-3120/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+PyScope é um observatório arquitetural para projetos Python. Ele foca em observação estática do grafo de imports, métricas de arquitetura e artefatos auditáveis.
 
-## O que é
+Este repositório ainda mantém o núcleo atual em `ags/`, mas o posicionamento público é PyScope: um observatório, não uma plataforma de governança.
 
-`AGS` é a plataforma de governança arquitetural observacional para projetos Python.
-Ele converte dependências estáticas em métricas confiáveis, classificações arquiteturais e artefatos auditáveis.
+## O que é PyScope
 
-> Observação arquitetural real para decisões técnicas sem ambiguidade.
+- um observatório arquitetural para código Python
+- uma ferramenta de visão, não de governança
+- focada no estado atual do projeto
+- produz resultados reproduzíveis e artefatos JSON
 
-## Por que AGS existe
+## Visualizador
 
-Muitas ferramentas ainda misturam métricas e inferências. O AGS entrega:
+O módulo `pyscope.visualizer` converte resultados C1 em um grafo Graphviz e gera um relatório HTML.
 
-- observação do estado atual do código Python
-- métricas com contrato de escopo e limitações claras
-- resultados reproduzíveis via GitHub Actions
-- artefatos compactos para validação externa
-
-## Para quem é
-
-- arquitetos e líderes técnicos Python
-- equipes de modernização de arquitetura
-- early adopters que testam métricas em código real
-- pesquisadores que exigem pipeline auditável
-
-## O que já está implementado
-
-- análise estática de grafo de imports em Python
-- métricas FASM: ACP, DCI, leakage, cycle density, CRI
-- classificação de regimes arquiteturais
-- observação C1 em repositórios reais
-- geração de snapshots e resultados JSON
-- workflow GitHub Actions para validação remota
-
-## Escopo
-
-### Em escopo
-
-- projetos Python
-- análise de import graph estático
-- observação real de projetos (C1)
-- resultados auditáveis em JSON
-- documentação explícita de limitações
-
-### Fora de escopo
-
-- análise dinâmica de runtime
-- linguagens não Python
-- previsões de futuro
-- causalidade além da descrição estrutural
-- monorepos massivos sem estratégia de amostragem
-- import condicional e reflection
-
-## Como começar
+### Exemplo
 
 ```bash
-git clone https://github.com/Bertolzo/architectural-governance.git
-cd architectural-governance
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -e .
-python -m pip install pytest pytest-cov
+python -m pyscope.visualizer --input-json tests/fixtures/c1_example.json --output-dir out/visual
 ```
 
-## Uso rápido
+### Artefatos gerados
 
-```bash
-python -m tools.c1_observe "requests" "https://github.com/psf/requests.git" c1_requests_remote
-```
+- `out/graph.dot`
+- `out/graph.svg` (se Graphviz estiver instalado)
+- `out/graph.png` (se Graphviz estiver instalado)
+- `out/index.html`
 
-## Validação imediata
+## CI
 
-Verifique que o artefato contém:
+A workflow `.github/workflows/visualizer-ci.yml` roda o visualizador em branches `scope/**` e publica os artefatos.
 
-- `c1_requests_result.json`
-- `/tmp/opencode/c1_requests_remote`
+## Estrutura do visualizador
 
-## GitHub-ready
+- `pyscope/visualizer/schema.py`
+- `pyscope/visualizer/graphviz_builder.py`
+- `pyscope/visualizer/renderer.py`
+- `pyscope/visualizer/html_report.py`
+- `pyscope/visualizer/cli.py`
 
-Este projeto já possui:
+## Observação
 
-- workflow de dispatch GitHub Actions
-- upload de artifact com resultado JSON e repositório observado
-- templates de PR e issue
-- guia de contribuição e código de conduta
-
-## Branching estratégico
-
-- `main` — linha estável para early adopters
-- `develop` — validação antes de promoção
-- `feature/*` — novos recursos funcionais
-- `exp/*` — experimentos e pesquisa
-- `doc/*` — mudanças de escopo e contrato
-- `hotfix/*` — correções urgentes
-
-## Contribuição
-
-1. Abra um issue com o caso de uso.
-2. Escolha a branch adequada.
-3. Preencha o template de PR.
-4. Execute validações:
-
-```bash
-python -m pytest -q
-python tools/verify_baseline.py
-```
-
-5. Atualize a documentação sempre que houver alteração de métricas ou escopo.
-
-## Estrutura do repositório
-
-- `ags/` — núcleo do sistema
-- `tools/` — scripts operacionais
-- `docs/` — modelo científico e limitações
-- `tests/` — validação de comportamento
-
-## Posicionamento
-
-O AGS é uma plataforma de governança arquitetural para quem precisa de observação, não de adivinhação.
-Use este repositório para transformar arquitetura Python em decisões técnicas fundadas e auditáveis.
+PyScope é um experimento de observabilidade; ele não implementa políticas de governança nem decisões de arquitetura automáticas.
