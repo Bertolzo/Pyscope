@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyscope"
+version = "0.0.0"
+description = "PyScope — Architectural observability toolkit"
+authors = [ { name = "Bertolzo" } ]
+requires-python = ">=3.13"
+
+[tool.poetry.scripts]
+pyscope = "pyscope:main"
