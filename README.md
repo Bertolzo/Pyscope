@@ -3,103 +3,84 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Bertolzo/Pyscope/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-10B981?style=for-the-badge" alt="License"></a>
-  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.12+-8B5CF6?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.12+"></a>
-  <a href="#testes"><img src="https://img.shields.io/badge/tests-277%20passed-10B981?style=for-the-badge" alt="277 tests"></a>
-  <a href="#escopo"><img src="https://img.shields.io/badge/FASM-v2.0-06B6D4?style=for-the-badge" alt="FASM v2.0"></a>
-  <a href="https://github.com/Bertolzo/Pyscope/actions"><img src="https://img.shields.io/badge/CI-GitHub_Actions-F59E0B?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI"></a>
+  <a href="https://github.com/Bertolzo/Pyscope/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.12+-blue.svg?logo=python&logoColor=white" alt="Python 3.12+"></a>
+  <a href="#testes"><img src="https://img.shields.io/badge/tests-277_passed-brightgreen.svg" alt="277 tests"></a>
+  <a href="#escopo"><img src="https://img.shields.io/badge/FASM-v2.0-lightgrey.svg" alt="FASM v2.0"></a>
+  <a href="https://github.com/Bertolzo/Pyscope/actions"><img src="https://img.shields.io/badge/CI-passing-brightgreen.svg" alt="CI"></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/observation-not_inference-8A8A9A?style=flat-square" alt="observation not inference">
-  <img src="https://img.shields.io/badge/static-AST--based-8A8A9A?style=flat-square" alt="static AST-based">
-  <img src="https://img.shields.io/badge/regimes-11_canonical-8A8A9A?style=flat-square" alt="11 regimes">
-  <img src="https://img.shields.io/badge/reproducible-100%25-8A8A9A?style=flat-square" alt="100% reproducible">
-</p>
-
-<p align="center">
-  <sub>
-    <a href="#filosofia">Filosofia</a> &middot;
-    <a href="#arquitetura">Arquitetura</a> &middot;
-    <a href="#módulos">Módulos</a> &middot;
-    <a href="#escopo">Escopo</a> &middot;
-    <a href="#quick-start">Quick Start</a> &middot;
-    <a href="#uso">Uso</a> &middot;
-    <a href="#design-decisions">Design</a> &middot;
-    <a href="#testes">Testes</a>
-  </sub>
+  <b>static observation · AST-based · reproducible · 11 architectural regimes</b>
 </p>
 
 ---
 
-## <span style="color:#8B5CF6">Filosofia</span>
+## Índice
+
+- [Filosofia](#filosofia)
+- [Arquitetura](#arquitetura)
+- [Módulos](#módulos)
+- [Escopo](#escopo)
+- [Quick Start](#quick-start)
+- [Uso](#uso)
+- [Design Decisions](#design-decisions)
+- [Testes](#testes)
+- [Estrutura do Repositório](#estrutura-do-repositório)
+
+---
+
+## Filosofia
 
 > **PyScope não adivinha. PyScope observa.**
 
-PyScope é uma ferramenta de **observação**, não de governança. Ela existe porque a maioria das ferramentas de arquitetura ainda **mistura métricas com inferências** — entregando opiniões onde deveriam entregar dados.
+PyScope é uma ferramenta de **observação arquitetural**, não de governança. Ela existe porque a maioria das ferramentas de arquitetura ainda **mistura métricas com inferências** — entregando opiniões onde deveriam entregar dados.
 
 O projeto se apoia em **três artefatos formais** que não podem ser confundidos:
 
-<table>
-<tr>
-<th style="color:#8B5CF6">FASM</th>
-<th style="color:#06B6D4">AGS</th>
-<th style="color:#10B981">PyScope</th>
-</tr>
-<tr>
-<td><strong>Modelo formal</strong></td>
-<td><strong>Implementação</strong></td>
-<td><strong>Observatório</strong></td>
-</tr>
-<tr>
-<td>Ontologia, teoria, axiomas, métricas, invariantes</td>
-<td>GraphBuilder, parsers, engine de métricas, banco</td>
-<td>ObservationSnapshot, RegimeClassification, protocolos C0/C1/C2</td>
-</tr>
-<tr>
-<td><em>o que</em> observar</td>
-<td><em>como</em> observar</td>
-<td>observação → FASM → evidência</td>
-</tr>
-</table>
+| Artefato | Papel | O que define |
+|----------|-------|-------------|
+| **FASM** | Modelo formal | Ontologia, teoria, axiomas, métricas, invariantes — *o que* observar |
+| **AGS** | Implementação | GraphBuilder, parsers, engine de métricas, banco — *como* observar |
+| **PyScope** | Observatório | ObservationSnapshot, RegimeClassification, protocolos C0/C1/C2 — observação → FASM → evidência |
 
-> FASM não contêm código Python. AGS não cria conceitos — apenas implementa. PyScope não cria teoria — apenas observa.
+> FASM não contém código Python. AGS não cria conceitos — apenas implementa. PyScope não cria teoria — apenas observa.
 
 ---
 
-## <span style="color:#06B6D4">Arquitetura</span>
+## Arquitetura
 
 ```
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                            ENTRY POINTS                                     ║
-║                                                                            ║
-║   tools/c1_observe.py      python -m ags           pyscope.visualizer      ║
-║   (observação remota)      (CLI orquestrada)       (dashboard dark)        ║
-╚════════════╤═════════════════╤═══════════════════════╤═══════════════════════╝
-             │                 │                       │
-             ▼                 ▼                       │
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                            ENTRY POINTS                                     │
+│                                                                            │
+│   tools/c1_observe.py      python -m ags           pyscope.visualizer      │
+│   (observação remota)      (CLI orquestrada)       (dashboard HTML)        │
+└──────────┬────────────────────┬───────────────────────┬──────────────────────┘
+           │                    │                       │
+           ▼                    ▼                       │
    ┌─────────────────────────────────────────┐         │
    │         AGS ORCHESTRATOR                │         │
    │      ags/orchestrator.py :: AGS         │         │
    │                                         │         │
    │   ┌────────┐  ┌──────────┐  ┌────────┐  │         │
    │   │ GRAPH  │─▶│STRUCTURAL│─▶│COUPLING│  │         │
-   │   └────┬───┘  └────┬─────┘  └───┬────┘  │         │
+   │   └────────┘  └──────────┘  └────────┘  │         │
    │        │           │            │       │         │
    │        ▼           ▼            ▼       │         │
    │   ┌─────────┐  ┌──────────┐  ┌────────┐  │         │
    │   │EVOLUTION│─▶│PREDICTION│─▶│GOVERN. │  │         │
-   │   └────┬────┘  └────┬─────┘  └───┬────┘  │         │
-   └────────┼────────────┼────────────┼────────┘         │
-            │            │            │                  │
-            ▼            ▼            ▼                  ▼
+   │   └─────────┘  └──────────┘  └────────┘  │         │
+   └────────┼─────────────┼──────────────┼────┘         │
+            │             │              │              │
+            ▼             ▼              ▼              ▼
    ┌──────────────────────────┐  ┌────────────────────────────┐
    │   MODELS + OBSERVATION   │  │       VISUALIZADOR         │
    │                          │  │                            │
    │  ArchitecturalTwin       │  │  C1Result JSON             │
-   │  ObservationSnapshot     │  │  → DOT (paleta Minimax)    │
+   │  ObservationSnapshot     │  │  → DOT (paleta própria)    │
    │  RegimeClassification    │  │  → SVG                     │
-   │                          │  │  → HTML dashboard dark     │
+   │                          │  │  → HTML dashboard          │
    └────────────┬─────────────┘  └────────────────────────────┘
                 │
                 ▼
@@ -110,7 +91,7 @@ O projeto se apoia em **três artefatos formais** que não podem ser confundidos
    └──────────────────────────┘  └────────────────────────────┘
 ```
 
-### <span style="color:#10B981">Fluxo de dados</span>
+### Fluxo de dados
 
 ```
 [AST Python] ──▶ GraphBuilder ──▶ ArchitecturalGraph (NetworkX)
@@ -126,17 +107,17 @@ O projeto se apoia em **três artefatos formais** que não podem ser confundidos
                   │      └── contra REGIME_TAXONOMY (11 atratores)
                   │
                   ▼
-            Relatório JSON + Dashboard HTML dark
+            Relatório JSON + Dashboard HTML
 ```
 
 ---
 
-## <span style="color:#10B981">Módulos</span>
+## Módulos
 
 ### AGS — Architectural Governance System
 
 <details>
-<summary><strong style="color:#8B5CF6">ags/core/graph/ — Grafo Arquitetural</strong></summary>
+<summary><strong>ags/core/graph/ — Grafo Arquitetural</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -150,7 +131,7 @@ O projeto se apoia em **três artefatos formais** que não podem ser confundidos
 </details>
 
 <details>
-<summary><strong style="color:#06B6D4">ags/core/observation/ — Observação C1</strong></summary>
+<summary><strong>ags/core/observation/ — Observação C1</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -162,7 +143,7 @@ O projeto se apoia em **três artefatos formais** que não podem ser confundidos
 </details>
 
 <details>
-<summary><strong style="color:#10B981">ags/core/models/ — Modelos de Estado</strong></summary>
+<summary><strong>ags/core/models/ — Modelos de Estado</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -172,7 +153,7 @@ O projeto se apoia em **três artefatos formais** que não podem ser confundidos
 </details>
 
 <details>
-<summary><strong style="color:#F59E0B">ags/synthetic/ — Validação C0.0</strong></summary>
+<summary><strong>ags/synthetic/ — Validação C0.0</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -187,7 +168,7 @@ O projeto se apoia em **três artefatos formais** que não podem ser confundidos
 </details>
 
 <details>
-<summary><strong style="color:#F472B6">ags/intelligence/ — Evolução e Predição</strong></summary>
+<summary><strong>ags/intelligence/ — Evolução e Predição</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -197,7 +178,7 @@ O projeto se apoia em **três artefatos formais** que não podem ser confundidos
 </details>
 
 <details>
-<summary><strong style="color:#3B82F6">ags/storage/ — Persistência</strong></summary>
+<summary><strong>ags/storage/ — Persistência</strong></summary>
 
 | Componente | Responsabilidade |
 |------------|-----------------|
@@ -209,32 +190,31 @@ O projeto se apoia em **três artefatos formais** que não podem ser confundidos
 
 </details>
 
-### <span style="color:#8B5CF6">PyScope Visualizer</span>
+### PyScope Visualizer
 
-Converte resultados de observação C1 em artefatos visuais com **paleta Minimax dark**.
+Converte resultados de observação C1 em artefatos visuais.
 
 | Componente | Responsabilidade |
 |------------|-----------------|
 | `schema.py` | Schemas `Node`, `Edge`, `C1Result` com `from_json()` |
 | `graphviz_builder.py` | Constrói string DOT com cor por regime, espessura por ACP/DCI |
 | `renderer.py` | Renderiza DOT → SVG/PNG via Graphviz |
-| `html_report.py` | Dashboard HTML dark com cards, gradientes e legend interativo |
+| `html_report.py` | Dashboard HTML com cards, legend e hover sutis |
 | `cli.py` | CLI: `python -m pyscope.visualizer --input-json ... --output-dir ...` |
 
-**Paleta de cores Minimax aplicada ao grafo:**
+**Paleta de cores aplicada ao grafo:**
 
-<table>
-<tr><th>Regime</th><th>Cor</th><th>Uso</th></tr>
-<tr><td><code>perfect</code></td><td><span style="color:#10B981">■</span> #10B981</td><td>emerald</td></tr>
-<tr><td><code>modular_*</code></td><td><span style="color:#8B5CF6">■</span> #8B5CF6</td><td>violet</td></tr>
-<tr><td><code>layered</code></td><td><span style="color:#06B6D4">■</span> #06B6D4</td><td>cyan</td></tr>
-<tr><td><code>entangled_*</code></td><td><span style="color:#F59E0B">■</span> #F59E0B</td><td>amber</td></tr>
-<tr><td><code>coupled</code></td><td><span style="color:#EF4444">■</span> #EF4444</td><td>red</td></tr>
-<tr><td><code>leaky</code></td><td><span style="color:#F472B6">■</span> #F472B6</td><td>pink</td></tr>
-<tr><td><code>collapsed</code></td><td><span style="color:#DC2626">■</span> #DC2626</td><td>deep red</td></tr>
-<tr><td><code>mixed</code></td><td><span style="color:#A78BFA">■</span> #A78BFA</td><td>light violet</td></tr>
-<tr><td><code>acyclic_dominant</code></td><td><span style="color:#22D3EE">■</span> #22D3EE</td><td>light cyan</td></tr>
-</table>
+| Regime | Cor | Uso |
+|--------|-----|-----|
+| `perfect` | `#22C55E` | green |
+| `modular_*` | `#38BDF8` | sky blue |
+| `layered` | `#60A5FA` | light blue |
+| `entangled_*` | `#F59E0B` | amber |
+| `coupled` | `#EF4444` | red |
+| `leaky` | `#EC4899` | pink |
+| `collapsed` | `#991B1B` | deep red |
+| `mixed` | `#A78BFA` | violet |
+| `acyclic_dominant` | `#67E8F9` | light cyan |
 
 ### Tools
 
@@ -249,9 +229,9 @@ Converte resultados de observação C1 em artefatos visuais com **paleta Minimax
 
 ---
 
-## <span style="color:#F472B6">Escopo</span>
+## Escopo
 
-### <span style="color:#10B981">✅ Em escopo</span>
+### Em escopo
 
 - Projetos Python com estrutura de pacotes padrão
 - Análise **estática** do grafo de imports (AST)
@@ -259,11 +239,11 @@ Converte resultados de observação C1 em artefatos visuais com **paleta Minimax
 - Classificação em 11 regimes arquiteturais
 - Observação remota de repositórios (C1)
 - Resultados auditáveis em JSON
-- Visualização Graphviz + dashboard HTML dark (paleta Minimax)
+- Visualização Graphviz + dashboard HTML
 - Geração sintética para validação de invariantes (C0.0)
 - Pipeline GitHub Actions para CI/CD
 
-### <span style="color:#EF4444">❌ Fora de escopo (deliberadamente)</span>
+### Fora de escopo (deliberadamente)
 
 - Análise dinâmica de runtime (profiling, tracing)
 - Linguagens que não sejam Python
@@ -274,7 +254,7 @@ Converte resultados de observação C1 em artefatos visuais com **paleta Minimax
 
 ---
 
-## <span style="color:#06B6D4">Quick Start</span>
+## Quick Start
 
 ```bash
 # Clone
@@ -295,9 +275,9 @@ python -m pytest -q --no-cov
 
 ---
 
-## <span style="color:#8B5CF6">Uso</span>
+## Uso
 
-### <span style="color:#10B981">Observação C1</span>
+### Observação C1
 
 Observe a arquitetura de qualquer repositório Python público:
 
@@ -325,9 +305,9 @@ Saída esperada:
 └── ✅ Artefato: c1_requests_result.json
 ```
 
-### <span style="color:#06B6D4">Visualizador</span>
+### Visualizador
 
-Converta um resultado C1 em grafo + dashboard HTML dark:
+Converta um resultado C1 em grafo + dashboard HTML:
 
 ```bash
 python -m pyscope.visualizer \
@@ -339,22 +319,22 @@ Gera:
 
 ```
 out/
-├── graph.dot        # Grafo em formato DOT (paleta Minimax)
+├── graph.dot        # Grafo em formato DOT
 ├── graph.svg        # Renderização SVG
 ├── graph.png        # Renderização PNG
-└── index.html       # Dashboard HTML dark (cards, gradientes, legend)
+└── index.html       # Dashboard HTML com SVG + métricas
 ```
 
 O dashboard HTML tem:
 
-- **Header** com gradiente roxo→ciano→verde
-- **Cards** coloridos por tipo de métrica (purple/cyan/emerald/amber/pink)
-- **SVG do grafo** com fundo `#0D0D0F` e nós coloridos por regime
-- **Legend interativa** com swatches de cores
-- **Hover effects** sutis (translateY, shadow roxo)
-- **Footer** com hash do artefato gerado
+- Header com título e metadados do repositório
+- Cards coloridos por tipo de métrica
+- SVG do grafo com nós coloridos por regime
+- Legend interativa com swatches de cores
+- Hover effects sutis
+- Footer com hash do artefato gerado
 
-### <span style="color:#F59E0B">CLI AGS</span>
+### CLI AGS
 
 ```bash
 # Analisar um projeto local
@@ -369,89 +349,22 @@ ags forecast
 
 ---
 
-## <span style="color:#F59E0B">Ciclo de vida de uma observação</span>
+## Design Decisions
 
-```
-1. CLONE
-   tools/c1_observe.py clona o repositório alvo
-         │
-2. PARSE (AST)
-   GraphBuilder varre todos os .py, extrai imports
-   → Resolve aliases: import a, b → 2 edges
-   → Resolve submódulos: from pkg.sub import X → pkg/sub.py
-         │
-3. GRAFO
-   ArchitecturalGraph (NetworkX direcionado)
-   → Nós: FileNode (caminho real) + ModuleNode (pacote)
-   → Arestas: ImportEdge (src → dst, com tipo)
-         │
-4. MÉTRICAS PRIMITIVAS
-   ObservationSnapshot
-   → cross_domain_ratio, intra_domain_ratio
-   → boundary leakage
-   → cycle density
-   → observation_quality
-         │
-5. CLASSIFICAÇÃO
-   classify_from_snapshot() contra REGIME_TAXONOMY
-   → Distância euclidiana aos 11 centros de regime
-   → Nearest, second_nearest, margin, confidence
-         │
-6. REPORT
-   → JSON com métricas + classificação
-   → Visualizador: DOT (paleta Minimax) → SVG → Dashboard HTML dark
-```
+| Decisão | Justificativa |
+|---------|---------------|
+| **Métricas [0,1] em vez de scores [0,100]** | Alinhamento com o modelo formal FASM; permite comparação direta com a taxonomia sintética |
+| **cycle_density = edges_in_cycles / total_edges** | Mede acoplamento cíclico real (não complexidade ciclomática) |
+| **intra_domain_ratio direto (não 1 - cross)** | Revela gaps de classificação quando ambos são baixos |
+| **Self-loops ignorados** | Não representam dependência arquitetural entre entidades distintas |
+| **confidence = quality / (1 + distance)** | Mapeia qualquer distância a (0, 1]; quality penaliza observações parciais |
+| **Parser via AST (não regex)** | AST capta a semântica real do código; regex falha em imports condicionais e dinâmicos |
+| **SQLite WAL mode** | Leitores não bloqueiam escritores; ideal para pipelines CI |
+| **Twin digital separado do snapshot** | Snapshot é o estado atual; twin é o agregado estado + histórico + predição |
 
 ---
 
-## <span style="color:#A78BFA">Design Decisions</span>
-
-<table>
-<tr>
-<th style="color:#8B5CF6">Decisão</th>
-<th style="color:#06B6D4">Justificativa</th>
-</tr>
-<tr>
-<td><strong>Métricas [0,1] em vez de scores [0,100]</strong></td>
-<td>Alinhamento com o modelo formal FASM; permite comparação direta com a taxonomia sintética</td>
-</tr>
-<tr>
-<td><strong>cycle_density = edges_in_cycles / total_edges</strong></td>
-<td>Mede acoplamento cíclico real (não complexidade ciclomática)</td>
-</tr>
-<tr>
-<td><strong>intra_domain_ratio direto (não 1 - cross)</strong></td>
-<td>Revela gaps de classificação quando ambos são baixos</td>
-</tr>
-<tr>
-<td><strong>Self-loops ignorados</strong></td>
-<td>Não representam dependência arquitetural entre entidades distintas</td>
-</tr>
-<tr>
-<td><strong>confidence = quality / (1 + distance)</strong></td>
-<td>Mapeia qualquer distância a (0, 1]; quality penaliza observações parciais</td>
-</tr>
-<tr>
-<td><strong>Parser via AST (não regex)</strong></td>
-<td>AST capta a semântica real do código; regex falha em imports condicionais e dinâmicos</td>
-</tr>
-<tr>
-<td><strong>SQLite WAL mode</strong></td>
-<td>Leitores não bloqueiam escritores; ideal para pipelines CI</td>
-</tr>
-<tr>
-<td><strong>Twin digital separado do snapshot</strong></td>
-<td>Snapshot é o estado atual; twin é o agregado estado + histórico + predição</td>
-</tr>
-<tr>
-<td><strong>Paleta dark Minimax no visualizador</strong></td>
-<td>Contraste forte, hierarquia visual clara, identidade diferenciada</td>
-</tr>
-</table>
-
----
-
-## <span style="color:#22D3EE">Testes</span>
+## Testes
 
 O projeto possui **277 testes** organizados em:
 
@@ -480,7 +393,7 @@ python -m pytest tests/test_graph.py tests/test_observation.py -v
 
 ---
 
-## <span style="color:#06B6D4">GitHub Actions</span>
+## GitHub Actions
 
 | Workflow | Trigger | O que faz |
 |----------|---------|-----------|
@@ -489,7 +402,7 @@ python -m pytest tests/test_graph.py tests/test_observation.py -v
 
 ---
 
-## <span style="color:#10B981">Branching</span>
+## Branching
 
 | Branch | Propósito |
 |--------|-----------|
@@ -503,7 +416,7 @@ python -m pytest tests/test_graph.py tests/test_observation.py -v
 
 ---
 
-## <span style="color:#8B5CF6">Contribuição</span>
+## Contribuição
 
 1. Abra um issue descrevendo o caso de uso
 2. Escolha a branch adequada conforme a branching strategy
@@ -520,7 +433,7 @@ python tools/verify_baseline.py
 
 ---
 
-## <span style="color:#22D3EE">Estrutura do Repositório</span>
+## Estrutura do Repositório
 
 ```
 ags/                              # Núcleo AGS
@@ -528,17 +441,16 @@ ags/                              # Núcleo AGS
 ├── __main__.py                   # Entry point: python -m ags
 ├── orchestrator.py               # Pipeline de 6 camadas
 ├── cli/                          # CLI Typer (analyze, history, forecast)
-├── core/                         # Core: graph, observation, models, structural, coupling, governance
+├── core/                         # graph, observation, models, structural, coupling, governance
 ├── intelligence/                 # Evolução e predição
 ├── storage/                      # SQLite WAL + 4 repositórios
 └── synthetic/                    # Geração sintética (11 regimes, CIR-1/2/3/4)
 
-pyscope/                          # Visualizador (paleta Minimax)
-├── __init__.py
+pyscope/                          # Visualizador
 └── visualizer/
     ├── cli.py                    # CLI entry point
-    ├── graphviz_builder.py       # DOT builder (paleta Minimax)
-    ├── html_report.py            # Dashboard HTML dark
+    ├── graphviz_builder.py       # DOT builder
+    ├── html_report.py            # Dashboard HTML
     ├── renderer.py               # DOT → SVG/PNG
     └── schema.py                 # C1Result, Node, Edge
 
@@ -551,8 +463,7 @@ tools/                            # Scripts operacionais
 ├── verify_baseline.py
 ├── remote_runner.py
 ├── resource_adapter.py
-├── providers/                    # AWS, OCI, Oracle
-└── ...
+└── providers/                    # AWS, OCI, Oracle
 
 docs/                             # Modelo científico e limitações
 tests/                            # 277 testes
@@ -562,13 +473,13 @@ tests/                            # 277 testes
 ---
 
 <p align="center">
-  <img src="https://img.shields.io/badge/PyScope-v2.0.0-8B5CF6?style=for-the-badge" alt="v2.0.0">
-  <img src="https://img.shields.io/badge/observation-not_inference-06B6D4?style=for-the-badge" alt="observation">
-  <img src="https://img.shields.io/badge/data-not_opinion-10B981?style=for-the-badge" alt="data">
+  <img src="https://img.shields.io/badge/PyScope-v2.0.0-blue.svg" alt="v2.0.0">
+  <img src="https://img.shields.io/badge/observation-not_inference-lightgrey.svg" alt="observation">
+  <img src="https://img.shields.io/badge/data-not_opinion-success.svg" alt="data">
 </p>
 
 <p align="center">
-  <strong>PyScope</strong> &mdash; transformando arquitetura Python em<br>
+  <strong>PyScope</strong> — transformando arquitetura Python em<br>
   <em>decisões técnicas fundadas, auditáveis e reproduzíveis.</em><br><br>
   <sub>Observação, não adivinhação. Dados, não opiniões.</sub>
 </p>
