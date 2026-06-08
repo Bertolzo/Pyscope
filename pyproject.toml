@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyscope"
+version = "0.1.0"
+description = "PyScope observability toolkit for Python architecture"
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [ { name = "Bertolzo" } ]
+
+[project.scripts]
+pyscope-visualizer = "pyscope.visualizer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["pyscope"]
+include = ["pyscope*"]

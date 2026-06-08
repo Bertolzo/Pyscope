@@ -1,0 +1,14 @@
+{
+  "repository": "requests",
+  "observed_at": "2026-06-08T15:47:00Z",
+  "nodes": [
+    {"id": "requests.api", "label": "requests.api", "acp": 12, "regime": "layered"},
+    {"id": "requests.sessions", "label": "requests.sessions", "acp": 8, "regime": "layered"},
+    {"id": "requests.adapters", "label": "requests.adapters", "acp": 5, "regime": "infrastructure"}
+  ],
+  "edges": [
+    {"src": "requests.api", "dst": "requests.sessions", "dci": 0.9},
+    {"src": "requests.sessions", "dst": "requests.adapters", "dci": 0.7}
+  ],
+  "metrics": {"cycle_density": 0.02, "cri": 0.85, "leakage": 0.1}
+}
